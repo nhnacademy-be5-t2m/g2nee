@@ -17,12 +17,13 @@ public class ReissueService {
     private final JWTUtil jwtUtil;
     private final RefreshTokenRepository refreshTokenRepository;
 
+    private final AddRefreshTokenUtil addRefreshTokenUtil;
 
 
-
-    public ReissueService(JWTUtil jwtUtil, RefreshTokenRepository refreshTokenRepository){
+    public ReissueService(JWTUtil jwtUtil, RefreshTokenRepository refreshTokenRepository, AddRefreshTokenUtil addRefreshTokenUtil){
         this.jwtUtil = jwtUtil;
-        this.refreshTokenRepository =refreshTokenRepository;
+        this.refreshTokenRepository = refreshTokenRepository;
+        this.addRefreshTokenUtil = addRefreshTokenUtil;
 
     }
 
@@ -75,7 +76,7 @@ public class ReissueService {
         //response
 
         refreshTokenRepository.deleteByRefreshToken(refresh);
-        AddRefreshTokenUtil.addRefreshEntity(refreshTokenRepository,username,newRefresh,86400000L);
+        addRefreshTokenUtil.addRefreshEntity(refreshTokenRepository,username,newRefresh,86400000L);
         response.setHeader("access", newAccess);
         response.addCookie(createCookie ("refresh",newRefresh));
 

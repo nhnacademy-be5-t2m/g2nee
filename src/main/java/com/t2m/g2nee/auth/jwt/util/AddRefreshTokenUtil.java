@@ -9,6 +9,10 @@ public class AddRefreshTokenUtil {
 
     private RefreshTokenRepository refreshTokenRepository;
 
+    public AddRefreshTokenUtil(RefreshTokenRepository refreshTokenRepository){
+        this.refreshTokenRepository = refreshTokenRepository;
+    }
+
 
 
     public static void addRefreshEntity(RefreshTokenRepository refreshTokenRepository,String username, String refresh, Long expiredMs){
