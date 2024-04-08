@@ -2,9 +2,11 @@ package com.t2m.g2nee.auth.jwt.util;
 
 import com.t2m.g2nee.auth.entity.RefreshToken;
 import com.t2m.g2nee.auth.repository.RefreshTokenRepository;
+import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
+@Component
 public class AddRefreshTokenUtil {
 
     private RefreshTokenRepository refreshTokenRepository;
