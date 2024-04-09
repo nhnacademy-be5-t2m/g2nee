@@ -14,6 +14,6 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public class MemberLoginDTO {
-    String userename;
+    String  username;
      String password;
 }
