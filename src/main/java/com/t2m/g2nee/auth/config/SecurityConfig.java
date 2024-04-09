@@ -1,5 +1,8 @@
 package com.t2m.g2nee.auth.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.t2m.g2nee.auth.filter.CustomLoginAuthenticationFilter;
+import com.t2m.g2nee.auth.filter.JWTFilter;
 import com.t2m.g2nee.auth.jwt.util.AddRefreshTokenUtil;
 import com.t2m.g2nee.auth.jwt.util.JWTUtil;
 import com.t2m.g2nee.auth.repository.RefreshTokenRepository;
@@ -25,6 +28,7 @@ import java.util.Collections;
 public class SecurityConfig {
 
 
+
     private final AuthenticationConfiguration authenticationConfiguration;
 
     private final JWTUtil jwtUtil;
@@ -32,11 +36,13 @@ public class SecurityConfig {
     private final RefreshTokenRepository refreshTokenRepository;
     private final AddRefreshTokenUtil addRefreshTokenUtil; // 레디스에 토큰 저장
 
-    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration,JWTUtil jwtUtil,RefreshTokenRepository refreshTokenRepository,AddRefreshTokenUtil addRefreshTokenUtil) {
+    private final ObjectMapper objectMapper;
+    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration,JWTUtil jwtUtil,RefreshTokenRepository refreshTokenRepository,AddRefreshTokenUtil addRefreshTokenUtil,ObjectMapper objectMapper) {
         this.authenticationConfiguration = authenticationConfiguration;
         this.jwtUtil =jwtUtil;
         this.refreshTokenRepository=refreshTokenRepository;
         this.addRefreshTokenUtil = addRefreshTokenUtil;
+        this.objectMapper=objectMapper;
     }
 
     @Bean
@@ -48,6 +54,7 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
@@ -57,7 +64,8 @@ public class SecurityConfig {
                             @Override
                             public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
                                 CorsConfiguration configuration = new CorsConfiguration();
-                                configuration.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
+                                configuration.setAllowedOrigins(Collections.singletonList("http://133.186.208.183:8100/"));
+                                configuration.setAllowedOrigins(Collections.singletonList("http://g2nee:g2nee@133.186.150.129:8761/eureka"));
                                 configuration.setAllowedMethods(Collections.singletonList("*"));
                                 configuration.setAllowCredentials(true);
                                 configuration.setAllowedHeaders(Collections.singletonList("*"));
@@ -76,21 +84,20 @@ public class SecurityConfig {
         http
                 .httpBasic((auth)-> auth.disable());
 
-        http
-                .authorizeHttpRequests((auth)-> auth
-                        .antMatchers("/login","/","/join").permitAll()
-                        .antMatchers("/auth/reissue").permitAll()
-                        .antMatchers("/admin").hasRole("ADMIN")
-                        .anyRequest().authenticated());
+//        http
+//                .authorizeHttpRequests((auth)-> auth
+//                        .antMatchers("/auth/login").permitAll()
+//                        .antMatchers("/auth/reissue").permitAll()
+//                        .anyRequest().authenticated());
 
 
 
 
         http
-                .addFilterBefore(new JWTFilter(jwtUtil), LoginFilter.class);
+                .addFilterBefore(new JWTFilter(jwtUtil), CustomLoginAuthenticationFilter.class);
 
         http
-                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration),jwtUtil,refreshRepository, addRefreshTokenUtil), UsernamePasswordAuthenticationFilter.class);
+                .addFilterAt(new CustomLoginAuthenticationFilter(authenticationManager(authenticationConfiguration),jwtUtil,refreshTokenRepository, addRefreshTokenUtil,objectMapper), UsernamePasswordAuthenticationFilter.class);
 
 
 

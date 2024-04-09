@@ -1,4 +1,4 @@
-package com.t2m.g2nee.auth.jwt;
+package com.t2m.g2nee.auth.filter;
 
 
 import com.t2m.g2nee.auth.jwt.util.JWTUtil;
@@ -24,10 +24,13 @@ public class JWTFilter extends OncePerRequestFilter {
         this.jwtUtil = jwtUtil;
     }
 
+    /**
+     * DoFilter를 통한 토큰 검증
+
+     */
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        //doFilter에 대한 특정 구현 진행, 토큰 검증하는 구현
 
         //헤더에서 access키에 담긴 토큰을 꺼냄
         String accessToken = request.getHeader("access");
@@ -45,7 +48,6 @@ public class JWTFilter extends OncePerRequestFilter {
             writer.print("accessToken expired");
 
             response.setStatus(HttpServletResponse.SC_ACCEPTED);
-            // 상태 코드, 응답 메세지
             return;
         }
         String category = jwtUtil.getCategory(accessToken);
@@ -69,7 +71,8 @@ public class JWTFilter extends OncePerRequestFilter {
         //-> shop에서 구현할 부븐
 
        // Authentication authToken = new UsernamePasswordAuthenticationToken(customUserDetails,null,customUserDetails.getAuthorities());
-        //SecurityContextHolder.getContext().setAuthentication(authToken);-> shop에서 customUserDetails 가져오기
+        //SecurityContextHolder.getContext().setAuthentication(authToken);
+        // -> shop에서 customUserDetails 가져오기
         filterChain.doFilter(request,response);
     }
 

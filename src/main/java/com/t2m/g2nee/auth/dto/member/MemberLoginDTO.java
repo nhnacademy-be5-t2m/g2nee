@@ -1,8 +1,19 @@
 package com.t2m.g2nee.auth.dto.member;
 
 
-//front에서 전달받는 Member로그인정보
+
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+/**
+ * front에서 전달받은 Member로그인 정보
+ */
+
+
+@AllArgsConstructor
+@Getter
 public class MemberLoginDTO {
-    private String memberId;
-    private String password;
+    String userename;
+     String password;
 }

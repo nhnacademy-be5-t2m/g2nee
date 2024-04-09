@@ -13,7 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-//shop에 member정보 요청
+
 @Slf4j
 @Component
 @AllArgsConstructor
@@ -22,11 +22,9 @@ public class MemberAdaptor {
     private final RestTemplate restTemplate;
 
     /**
-     * shop 서버에 회원정보를 요청하는 메소드.
-     *
-     * @param requestDto 멤버 아이디 정보가 들어있는 회원정보 요청 dto
-     * @return 회원정보를 응답받아 리턴해준다.
+     * shop에 Member정보 요청해 username이 담긴 MeberInfoRequest에 담음
      */
+
     public ResponseEntity<MemberInfoResponseDTO> loginRequest(
             MemberInfoRequestDTO requestDto) {
 
@@ -34,7 +32,7 @@ public class MemberAdaptor {
         HttpEntity<MemberInfoRequestDTO> entity = new HttpEntity<>(requestDto, headers);
 
         return restTemplate.exchange(
-                gateWayConfig.getGatewayUrl() + "/login",
+                gateWayConfig.getGatewayUrl() + "shop/member/getInfo",
                 HttpMethod.POST,
                 entity,
                 MemberInfoResponseDTO.class
