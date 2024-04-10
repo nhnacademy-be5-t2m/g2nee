@@ -2,10 +2,13 @@ package com.t2m.g2nee.auth.filter;
 
 
 import com.t2m.g2nee.auth.jwt.util.JWTUtil;
+import com.t2m.g2nee.auth.service.memberService.CustomUserDetailsService;
 import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -14,14 +17,22 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Collection;
+
+
 
 public class JWTFilter extends OncePerRequestFilter {
 
     private final JWTUtil jwtUtil;
 
-    public JWTFilter(JWTUtil jwtUtil) {
+    private final CustomUserDetailsService customUserDetailsService;
+
+
+
+    public JWTFilter(JWTUtil jwtUtil, CustomUserDetailsService customUserDetailsService) {
 
         this.jwtUtil = jwtUtil;
+        this.customUserDetailsService = customUserDetailsService;
     }
 
     /**
@@ -45,7 +56,7 @@ public class JWTFilter extends OncePerRequestFilter {
 
         }catch(ExpiredJwtException e){
             PrintWriter writer = response.getWriter();
-            writer.print("accessToken expired");
+            writer.print("accessToken이 만료되었습니다.");
 
             response.setStatus(HttpServletResponse.SC_ACCEPTED);
             return;
@@ -54,30 +65,24 @@ public class JWTFilter extends OncePerRequestFilter {
 
         if(!category.equals("access")){
             PrintWriter writer = response.getWriter();
-            writer.print("invalid access token");
+            writer.print("accessToken이 유효하지않습니다.");
 
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
 
+
         String username = jwtUtil.getUsername(accessToken);
-        String role = jwtUtil.getRole(accessToken);
+        Collection<? extends GrantedAuthority> authorities = jwtUtil.getAuthorities(accessToken);
 
-//
-//        User user = new User();
-//        user.setUsername(username);
-//        user.setRole(role);
-//        CustomUserDetails customUserDetails = new CustomUserDetails(user);
-        //-> shop에서 구현할 부븐
+        // UserDetailsService를 사용하여 사용자 정보 가져오기
+        UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
 
-       // Authentication authToken = new UsernamePasswordAuthenticationToken(customUserDetails,null,customUserDetails.getAuthorities());
-        //SecurityContextHolder.getContext().setAuthentication(authToken);
-        // -> shop에서 customUserDetails 가져오기
-        filterChain.doFilter(request,response);
+        // Authentication 객체 생성
+        Authentication authToken = new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
+        SecurityContextHolder.getContext().setAuthentication(authToken);
+        filterChain.doFilter(request, response);
     }
-
-
-
 }
 //Access 토큰 요청을 검증하는 JWTFilter에서 Access토큰이 만료된 경우 프론트 개발자와 협의된 상태 코드와 메세지 응답
 //프론트측 API클라이언트 요청시 Access토큰 만료 요청이 오면 예외문을 통해 refresh토큰을 서버측으로 전송하고 Access토큰을 발급받는 로직

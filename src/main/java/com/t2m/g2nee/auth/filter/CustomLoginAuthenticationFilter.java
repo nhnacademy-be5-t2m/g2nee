@@ -2,10 +2,11 @@ package com.t2m.g2nee.auth.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.t2m.g2nee.auth.dto.member.MemberLoginDTO;
-import com.t2m.g2nee.auth.exception.MemberDTOParsingException;
+import com.t2m.g2nee.auth.exception.token.MemberDTOParsingException;
 import com.t2m.g2nee.auth.jwt.util.AddRefreshTokenUtil;
 import com.t2m.g2nee.auth.jwt.util.JWTUtil;
 import com.t2m.g2nee.auth.repository.RefreshTokenRepository;
+import com.t2m.g2nee.auth.service.apiService.ShopApiService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -38,13 +39,15 @@ public class CustomLoginAuthenticationFilter extends UsernamePasswordAuthenticat
     private AddRefreshTokenUtil addRefreshTokenUtil;
 
     private final ObjectMapper objectMapper;
+    private final ShopApiService shopApiService;
 
-    public CustomLoginAuthenticationFilter(AuthenticationManager authenticationManager, JWTUtil jwtUtil, RefreshTokenRepository refreshTokenRepository, AddRefreshTokenUtil addRefreshTokenUtil,ObjectMapper objectMapper){
+    public CustomLoginAuthenticationFilter(AuthenticationManager authenticationManager, JWTUtil jwtUtil, RefreshTokenRepository refreshTokenRepository, AddRefreshTokenUtil addRefreshTokenUtil, ObjectMapper objectMapper, ShopApiService shopApiService){
         this.authenticationManager =authenticationManager;
         this.jwtUtil = jwtUtil;
         this.refreshTokenRepository = refreshTokenRepository;
         this.addRefreshTokenUtil =addRefreshTokenUtil;
         this.objectMapper=objectMapper;
+        this.shopApiService = shopApiService;
 
         super.setAuthenticationManager(authenticationManager);
         super.setFilterProcessesUrl("/auth/login");
@@ -54,9 +57,15 @@ public class CustomLoginAuthenticationFilter extends UsernamePasswordAuthenticat
     public Authentication attemptAuthentication(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)throws AuthenticationException{
 
 
+        /**
+         * shopDBServer로 보내 Shop서버 내에서  회원정보가 있는지 확인 확인되면 DTO에 담기 -> service로 구현, 불러올수 있게
+         * DTO같은 역할 토큰에 담아 인증 로직을 처리할 Manager로 전달
+         */
+
+
 
         /**
-         * 요청에 담긴 username, password담기
+         * 요청에 담긴 front의 유저정보 username, password담기
          */
 
         MemberLoginDTO memberLoginDTO;
@@ -68,18 +77,18 @@ public class CustomLoginAuthenticationFilter extends UsernamePasswordAuthenticat
             throw  new MemberDTOParsingException();
         }
 
-        /**
-         * shopDB에 회원정보가 있는지 확인 -> service로 구현, 불러올수 있게
-         * DTO같은 역할 토큰에 담아 인증 로직을 처리할 Manager로 전달
-         */
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(memberLoginDTO.getUserename(),memberLoginDTO.getPassword());
+        if(!shopApiService.login(memberLoginDTO)){
+            throw new RuntimeException("login 정보 불일치");
+        }
+
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(memberLoginDTO.getUsername(),memberLoginDTO.getPassword());
         return authenticationManager.authenticate(authenticationToken);
     }
 
 
     /**
      * 로그인 성공시 실행하는 메서드
-     * 로그인 성공시 로그인한 객체 가져와서  username, role 값넣어서 token 만들어줌
+     * 로그인 성공시 로그인한 객체 가져와서  username, authorities 값넣어서 token 만들어줌
      */
     @Override
     protected void successfulAuthentication(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain, Authentication authentication){
@@ -92,13 +101,13 @@ public class CustomLoginAuthenticationFilter extends UsernamePasswordAuthenticat
         GrantedAuthority auth= iterator.next();
         String role =auth.getAuthority();
 
-        String access = jwtUtil.createJwt("access",username,role,600000L);
-        String refresh = jwtUtil.createJwt("refresh",username,role,86400000L);
+        String access = jwtUtil.createJwt("access",username,authorities,600000L);
+        String refresh = jwtUtil.createJwt("refresh",username,authorities,86400000L);
 
-        addRefreshTokenUtil.addRefreshEntity(refreshTokenRepository,username,refresh,86400000L);
+        addRefreshTokenUtil.addRefreshEntity(refreshTokenRepository,username,refresh,access,86400000L);
 
         httpServletResponse.setHeader("access",access);
-        httpServletResponse.addCookie(createCookie("refresh",refresh));
+       // httpServletResponse.addCookie(createCookie("refresh",refresh));
         httpServletResponse.setStatus(HttpStatus.OK.value());
 
 

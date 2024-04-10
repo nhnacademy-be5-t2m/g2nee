@@ -1,7 +1,7 @@
 package com.t2m.g2nee.auth.controller;
 
 import com.t2m.g2nee.auth.repository.RefreshTokenRepository;
-import com.t2m.g2nee.auth.service.ReissueService;
+import com.t2m.g2nee.auth.service.tokenService.ReissueService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;

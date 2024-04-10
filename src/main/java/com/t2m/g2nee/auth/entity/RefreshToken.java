@@ -4,11 +4,10 @@ package com.t2m.g2nee.auth.entity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+
 
 @Getter
 @Setter
@@ -17,15 +16,14 @@ import javax.persistence.Id;
 public class RefreshToken {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long refreshId;
+    private String refreshToken;
 
 
     private String username;
 
 
-    private String refreshToken;
 
+    private String accessToken;
 
     private String expiration;
 

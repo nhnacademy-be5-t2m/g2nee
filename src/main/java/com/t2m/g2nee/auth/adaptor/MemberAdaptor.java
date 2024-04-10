@@ -1,10 +1,9 @@
-package com.t2m.g2nee.auth.Adaptor;
+package com.t2m.g2nee.auth.adaptor;
 
 import com.t2m.g2nee.auth.config.GatewayConfig;
 import com.t2m.g2nee.auth.dto.member.MemberInfoRequestDTO;
 import com.t2m.g2nee.auth.dto.member.MemberInfoResponseDTO;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -22,7 +21,7 @@ public class MemberAdaptor {
     private final RestTemplate restTemplate;
 
     /**
-     * shop에 Member정보 요청해 username이 담긴 MeberInfoRequest에 담음
+     * shop에 Member정보 요청해 username이 담긴 MemberInfoRequest에 담음
      */
 
     public ResponseEntity<MemberInfoResponseDTO> loginRequest(

@@ -17,7 +17,7 @@ public class AddRefreshTokenUtil {
 
 
 
-    public static void addRefreshEntity(RefreshTokenRepository refreshTokenRepository,String username, String refresh, Long expiredMs){
+    public static void addRefreshEntity(RefreshTokenRepository refreshTokenRepository,String username, String refresh, String access,Long expiredMs){
 
 
 
@@ -28,6 +28,7 @@ public class AddRefreshTokenUtil {
         refreshTokenEntity.setUsername(username);
         refreshTokenEntity.setExpiration(date.toString());
         refreshTokenEntity.setRefreshToken(refresh);
+        refreshTokenEntity.setAccessToken(access);
 
         refreshTokenRepository.save(refreshTokenEntity);
     }

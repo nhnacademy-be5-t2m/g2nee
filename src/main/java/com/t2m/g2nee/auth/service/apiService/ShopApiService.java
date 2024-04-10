@@ -1,4 +1,4 @@
-package com.t2m.g2nee.auth.service;
+package com.t2m.g2nee.auth.service.apiService;
 
 import com.t2m.g2nee.auth.dto.member.MemberLoginDTO;
 import org.springframework.beans.factory.annotation.Value;
