@@ -3,6 +3,7 @@ package com.t2m.g2nee.auth.Adaptor;
 import com.t2m.g2nee.auth.config.GatewayConfig;
 import com.t2m.g2nee.auth.dto.member.MemberInfoRequestDTO;
 import com.t2m.g2nee.auth.dto.member.MemberInfoResponseDTO;
+import com.t2m.g2nee.auth.dto.member.MemberLoginDTO;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,13 +30,25 @@ public class MemberAdaptor {
             MemberInfoRequestDTO requestDto) {
 
         HttpHeaders headers = new HttpHeaders();
-        HttpEntity<MemberInfoRequestDTO> entity = new HttpEntity<>(requestDto, headers);
+        HttpEnt<MemberInfoRequestDTO> entity = new HttpEntity<>(requestDto, headers);
 
         return restTemplate.exchange(
                 gateWayConfig.getGatewayUrl() + "shop/member/getInfo",
                 HttpMethod.POST,
                 entity,
                 MemberInfoResponseDTO.class
+        );
+    }
+
+    public ResponseEntity<Boolean> login(MemberLoginDTO memberLoginDTO){
+        HttpHeaders headers = new HttpHeaders();
+        HttpEntity<MemberLoginDTO> entity = new HttpEntity<>(memberLoginDTO,headers);
+
+        return restTemplate.exchange(
+                gateWayConfig.getGatewayUrl() + "shop/member/login",
+                HttpMethod.POST,
+                entity,
+                Boolean.class
         );
     }
 }

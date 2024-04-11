@@ -1,6 +1,7 @@
 package com.t2m.g2nee.auth.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.t2m.g2nee.auth.Adaptor.MemberAdaptor;
 import com.t2m.g2nee.auth.filter.CustomLoginAuthenticationFilter;
 import com.t2m.g2nee.auth.filter.JWTFilter;
 import com.t2m.g2nee.auth.jwt.util.AddRefreshTokenUtil;
@@ -37,12 +38,15 @@ public class SecurityConfig {
     private final AddRefreshTokenUtil addRefreshTokenUtil; // 레디스에 토큰 저장
 
     private final ObjectMapper objectMapper;
-    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration,JWTUtil jwtUtil,RefreshTokenRepository refreshTokenRepository,AddRefreshTokenUtil addRefreshTokenUtil,ObjectMapper objectMapper) {
+    private final MemberAdaptor memberAdaptor;
+    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration, JWTUtil jwtUtil, RefreshTokenRepository refreshTokenRepository, AddRefreshTokenUtil addRefreshTokenUtil, ObjectMapper objectMapper,
+                          MemberAdaptor memberAdaptor) {
         this.authenticationConfiguration = authenticationConfiguration;
         this.jwtUtil =jwtUtil;
         this.refreshTokenRepository=refreshTokenRepository;
         this.addRefreshTokenUtil = addRefreshTokenUtil;
         this.objectMapper=objectMapper;
+        this.memberAdaptor = memberAdaptor;
     }
 
     @Bean
@@ -97,7 +101,7 @@ public class SecurityConfig {
                 .addFilterBefore(new JWTFilter(jwtUtil), CustomLoginAuthenticationFilter.class);
 
         http
-                .addFilterAt(new CustomLoginAuthenticationFilter(authenticationManager(authenticationConfiguration),jwtUtil,refreshTokenRepository, addRefreshTokenUtil,objectMapper), UsernamePasswordAuthenticationFilter.class);
+                .addFilterAt(new CustomLoginAuthenticationFilter(authenticationManager(authenticationConfiguration),jwtUtil,refreshTokenRepository, addRefreshTokenUtil,objectMapper,memberAdaptor), UsernamePasswordAuthenticationFilter.class);
 
 
 

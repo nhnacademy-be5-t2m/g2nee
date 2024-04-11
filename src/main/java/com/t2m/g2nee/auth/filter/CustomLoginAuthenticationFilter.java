@@ -1,11 +1,14 @@
 package com.t2m.g2nee.auth.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.t2m.g2nee.auth.Adaptor.MemberAdaptor;
 import com.t2m.g2nee.auth.dto.member.MemberLoginDTO;
 import com.t2m.g2nee.auth.exception.MemberDTOParsingException;
 import com.t2m.g2nee.auth.jwt.util.AddRefreshTokenUtil;
 import com.t2m.g2nee.auth.jwt.util.JWTUtil;
 import com.t2m.g2nee.auth.repository.RefreshTokenRepository;
+import com.t2m.g2nee.auth.service.ShopApiService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -27,7 +30,6 @@ import java.util.Iterator;
  * 정상로그인시 jwt발급 필터
  * (username, password를 front로부터 받아 shopDB검증후 일치하면)
  **/
-
 public class CustomLoginAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private  final AuthenticationManager authenticationManager;
@@ -38,14 +40,16 @@ public class CustomLoginAuthenticationFilter extends UsernamePasswordAuthenticat
     private AddRefreshTokenUtil addRefreshTokenUtil;
 
     private final ObjectMapper objectMapper;
+    private final MemberAdaptor memberAdaptor;
 
-    public CustomLoginAuthenticationFilter(AuthenticationManager authenticationManager, JWTUtil jwtUtil, RefreshTokenRepository refreshTokenRepository, AddRefreshTokenUtil addRefreshTokenUtil,ObjectMapper objectMapper){
+    public CustomLoginAuthenticationFilter(AuthenticationManager authenticationManager, JWTUtil jwtUtil, RefreshTokenRepository refreshTokenRepository, AddRefreshTokenUtil addRefreshTokenUtil, ObjectMapper objectMapper,
+                                           MemberAdaptor memberAdaptor){
         this.authenticationManager =authenticationManager;
         this.jwtUtil = jwtUtil;
         this.refreshTokenRepository = refreshTokenRepository;
         this.addRefreshTokenUtil =addRefreshTokenUtil;
         this.objectMapper=objectMapper;
-
+        this.memberAdaptor = memberAdaptor;
         super.setAuthenticationManager(authenticationManager);
         super.setFilterProcessesUrl("/auth/login");
     }
@@ -68,11 +72,15 @@ public class CustomLoginAuthenticationFilter extends UsernamePasswordAuthenticat
             throw  new MemberDTOParsingException();
         }
 
+        if(!memberAdaptor.login(memberLoginDTO).getBody()){
+            throw new RuntimeException("login 정보가 불일치 합니다.");
+        }
+
         /**
          * shopDB에 회원정보가 있는지 확인 -> service로 구현, 불러올수 있게
          * DTO같은 역할 토큰에 담아 인증 로직을 처리할 Manager로 전달
          */
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(memberLoginDTO.getUserename(),memberLoginDTO.getPassword());
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(memberLoginDTO.getUsername(),memberLoginDTO.getPassword());
         return authenticationManager.authenticate(authenticationToken);
     }
 
