@@ -1,13 +1,13 @@
 package com.t2m.g2nee.auth.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.t2m.g2nee.auth.Adaptor.MemberAdaptor;
 import com.t2m.g2nee.auth.filter.CustomLoginAuthenticationFilter;
 import com.t2m.g2nee.auth.filter.JWTFilter;
 import com.t2m.g2nee.auth.jwt.util.AddRefreshTokenUtil;
 import com.t2m.g2nee.auth.jwt.util.JWTUtil;
 import com.t2m.g2nee.auth.repository.RefreshTokenRepository;
-import com.t2m.g2nee.auth.service.apiService.ShopApiService;
-import com.t2m.g2nee.auth.service.memberService.CustomUserDetailsService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -38,17 +38,15 @@ public class SecurityConfig {
     private final AddRefreshTokenUtil addRefreshTokenUtil; // 레디스에 토큰 저장
 
     private final ObjectMapper objectMapper;
-
-    private final CustomUserDetailsService customUserDetailsService;
-
-
-    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration, JWTUtil jwtUtil, RefreshTokenRepository refreshTokenRepository, AddRefreshTokenUtil addRefreshTokenUtil, ObjectMapper objectMapper, CustomUserDetailsService customUserDetailsService) {
+    private final MemberAdaptor memberAdaptor;
+    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration, JWTUtil jwtUtil, RefreshTokenRepository refreshTokenRepository, AddRefreshTokenUtil addRefreshTokenUtil, ObjectMapper objectMapper,
+                          MemberAdaptor memberAdaptor) {
         this.authenticationConfiguration = authenticationConfiguration;
         this.jwtUtil =jwtUtil;
         this.refreshTokenRepository=refreshTokenRepository;
         this.addRefreshTokenUtil = addRefreshTokenUtil;
         this.objectMapper=objectMapper;
-        this.customUserDetailsService = customUserDetailsService;
+        this.memberAdaptor = memberAdaptor;
     }
 
     @Bean
@@ -90,20 +88,20 @@ public class SecurityConfig {
         http
                 .httpBasic((auth)-> auth.disable());
 
-        http
-                .authorizeHttpRequests((auth)-> auth
-                        .antMatchers("/auth/login").permitAll()
+//        http
+//                .authorizeHttpRequests((auth)-> auth
+//                        .antMatchers("/auth/login").permitAll()
 //                        .antMatchers("/auth/reissue").permitAll()
-                        .anyRequest().authenticated());
+//                        .anyRequest().authenticated());
 
 
 
 
         http
-                .addFilterBefore(new JWTFilter(jwtUtil,customUserDetailsService), CustomLoginAuthenticationFilter.class);
+                .addFilterBefore(new JWTFilter(jwtUtil), CustomLoginAuthenticationFilter.class);
 
         http
-                .addFilterAt(new CustomLoginAuthenticationFilter(authenticationManager(authenticationConfiguration),jwtUtil,refreshTokenRepository, addRefreshTokenUtil,objectMapper,new ShopApiService()), UsernamePasswordAuthenticationFilter.class);
+                .addFilterAt(new CustomLoginAuthenticationFilter(authenticationManager(authenticationConfiguration),jwtUtil,refreshTokenRepository, addRefreshTokenUtil,objectMapper,memberAdaptor), UsernamePasswordAuthenticationFilter.class);
 
 
 
