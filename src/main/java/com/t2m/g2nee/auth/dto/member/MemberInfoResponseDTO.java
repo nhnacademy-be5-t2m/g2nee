@@ -14,7 +14,7 @@ public class MemberInfoResponseDTO {
     private Long memberId;
     private String username;
     private String password;
-    private List<String> Authorities;
+    private List<String> authorities;
 
 
 }

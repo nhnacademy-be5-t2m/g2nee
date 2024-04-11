@@ -29,7 +29,7 @@ public class MemberAdaptor {
             MemberInfoRequestDTO requestDto) {
 
         HttpHeaders headers = new HttpHeaders();
-        HttpEnt<MemberInfoRequestDTO> entity = new HttpEntity<>(requestDto, headers);
+        HttpEntity<MemberInfoRequestDTO> entity = new HttpEntity<>(requestDto, headers);
 
         return restTemplate.exchange(
                 gateWayConfig.getGatewayUrl() + "shop/member/getInfo",

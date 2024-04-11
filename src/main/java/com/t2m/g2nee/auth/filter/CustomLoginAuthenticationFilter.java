@@ -1,14 +1,12 @@
 package com.t2m.g2nee.auth.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.t2m.g2nee.auth.Adaptor.MemberAdaptor;
+import com.t2m.g2nee.auth.adaptor.MemberAdaptor;
 import com.t2m.g2nee.auth.dto.member.MemberLoginDTO;
-import com.t2m.g2nee.auth.exception.MemberDTOParsingException;
+import com.t2m.g2nee.auth.exception.token.MemberDTOParsingException;
 import com.t2m.g2nee.auth.jwt.util.AddRefreshTokenUtil;
 import com.t2m.g2nee.auth.jwt.util.JWTUtil;
 import com.t2m.g2nee.auth.repository.RefreshTokenRepository;
-import com.t2m.g2nee.auth.service.ShopApiService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -100,10 +98,10 @@ public class CustomLoginAuthenticationFilter extends UsernamePasswordAuthenticat
         GrantedAuthority auth= iterator.next();
         String role =auth.getAuthority();
 
-        String access = jwtUtil.createJwt("access",username,role,600000L);
-        String refresh = jwtUtil.createJwt("refresh",username,role,86400000L);
+        String access = jwtUtil.createJwt("access",username,authentication.getAuthorities(),600000L);
+        String refresh = jwtUtil.createJwt("refresh",username,authentication.getAuthorities(),86400000L);
 
-        addRefreshTokenUtil.addRefreshEntity(refreshTokenRepository,username,refresh,86400000L);
+        addRefreshTokenUtil.addRefreshEntity(refreshTokenRepository,username,refresh,access,86400000L);
 
         httpServletResponse.setHeader("access",access);
         httpServletResponse.addCookie(createCookie("refresh",refresh));

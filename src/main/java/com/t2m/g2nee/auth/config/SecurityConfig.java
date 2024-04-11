@@ -1,13 +1,13 @@
 package com.t2m.g2nee.auth.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.t2m.g2nee.auth.Adaptor.MemberAdaptor;
+import com.t2m.g2nee.auth.adaptor.MemberAdaptor;
 import com.t2m.g2nee.auth.filter.CustomLoginAuthenticationFilter;
 import com.t2m.g2nee.auth.filter.JWTFilter;
 import com.t2m.g2nee.auth.jwt.util.AddRefreshTokenUtil;
 import com.t2m.g2nee.auth.jwt.util.JWTUtil;
 import com.t2m.g2nee.auth.repository.RefreshTokenRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.t2m.g2nee.auth.service.memberService.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -98,7 +98,7 @@ public class SecurityConfig {
 
 
         http
-                .addFilterBefore(new JWTFilter(jwtUtil), CustomLoginAuthenticationFilter.class);
+                .addFilterBefore(new JWTFilter(jwtUtil,new CustomUserDetailsService(memberAdaptor)), CustomLoginAuthenticationFilter.class);
 
         http
                 .addFilterAt(new CustomLoginAuthenticationFilter(authenticationManager(authenticationConfiguration),jwtUtil,refreshTokenRepository, addRefreshTokenUtil,objectMapper,memberAdaptor), UsernamePasswordAuthenticationFilter.class);
