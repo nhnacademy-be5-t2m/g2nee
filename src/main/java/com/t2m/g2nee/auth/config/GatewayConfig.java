@@ -11,12 +11,13 @@ public class GatewayConfig {
 
     @Value("${g2nee.gateway}")
     private String gateway;
-    public  String getGatewayUrl(){
+
+    public String getGatewayUrl() {
         return gateway;
     }
 
-    public void setGateway(String gateway){
-        this.gateway=gateway;
+    public void setGateway(String gateway) {
+        this.gateway = gateway;
     }
 }
 

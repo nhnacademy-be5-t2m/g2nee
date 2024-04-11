@@ -38,15 +38,15 @@ public class SecurityConfig {
     private final AddRefreshTokenUtil addRefreshTokenUtil; // 레디스에 토큰 저장
 
     private final ObjectMapper objectMapper;
-    private final MemberAdaptor memberAdaptor;
+    private final CustomUserDetailsService customUserDetailsService;
     public SecurityConfig(AuthenticationConfiguration authenticationConfiguration, JWTUtil jwtUtil, RefreshTokenRepository refreshTokenRepository, AddRefreshTokenUtil addRefreshTokenUtil, ObjectMapper objectMapper,
-                          MemberAdaptor memberAdaptor) {
+                          CustomUserDetailsService customUserDetailsService) {
         this.authenticationConfiguration = authenticationConfiguration;
         this.jwtUtil =jwtUtil;
         this.refreshTokenRepository=refreshTokenRepository;
         this.addRefreshTokenUtil = addRefreshTokenUtil;
         this.objectMapper=objectMapper;
-        this.memberAdaptor = memberAdaptor;
+        this.customUserDetailsService = customUserDetailsService;
     }
 
     @Bean
@@ -98,10 +98,10 @@ public class SecurityConfig {
 
 
         http
-                .addFilterBefore(new JWTFilter(jwtUtil,new CustomUserDetailsService(memberAdaptor)), CustomLoginAuthenticationFilter.class);
+                .addFilterBefore(new JWTFilter(jwtUtil,customUserDetailsService), CustomLoginAuthenticationFilter.class);
 
         http
-                .addFilterAt(new CustomLoginAuthenticationFilter(authenticationManager(authenticationConfiguration),jwtUtil,refreshTokenRepository, addRefreshTokenUtil,objectMapper,memberAdaptor), UsernamePasswordAuthenticationFilter.class);
+                .addFilterAt(new CustomLoginAuthenticationFilter(authenticationManager(authenticationConfiguration),jwtUtil,refreshTokenRepository, addRefreshTokenUtil,objectMapper), UsernamePasswordAuthenticationFilter.class);
 
 
 

@@ -36,19 +36,18 @@ public class CustomUserDetailsService implements UserDetailsService {
         try {
             memberData = memberAdaptor.loginRequest(new MemberInfoRequestDTO(username));
 
-        }catch (HttpClientErrorException e){
+        } catch (HttpClientErrorException e) {
             throw new NotMemberOfG2nee();
         }
         MemberInfoResponseDTO memberInfoResponseDTO = memberData.getBody();
 
-        List<SimpleGrantedAuthority> grantedAuthorities = memberInfoResponseDTO.getAuthorities().stream().map(SimpleGrantedAuthority::new)
-                .collect(Collectors.toList());
+        List<SimpleGrantedAuthority> grantedAuthorities =
+                memberInfoResponseDTO.getAuthorities().stream().map(SimpleGrantedAuthority::new)
+                        .collect(Collectors.toList());
 
 
-
-
-
-        return new User(memberInfoResponseDTO.getUsername().toString(),memberInfoResponseDTO.getPassword().toString(),grantedAuthorities);
+        return new User(memberInfoResponseDTO.getUsername().toString(), memberInfoResponseDTO.getPassword().toString(),
+                grantedAuthorities);
 
     }
 }

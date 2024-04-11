@@ -31,7 +31,8 @@ public class ReissueService {
     private final AddRefreshTokenUtil addRefreshTokenUtil;
 
 
-    public ReissueService(JWTUtil jwtUtil, RefreshTokenRepository refreshTokenRepository, AddRefreshTokenUtil addRefreshTokenUtil){
+    public ReissueService(JWTUtil jwtUtil, RefreshTokenRepository refreshTokenRepository,
+                          AddRefreshTokenUtil addRefreshTokenUtil) {
         this.jwtUtil = jwtUtil;
         this.refreshTokenRepository = refreshTokenRepository;
         this.addRefreshTokenUtil = addRefreshTokenUtil;
@@ -75,8 +76,8 @@ public class ReissueService {
         }
 
         Boolean isExist = refreshTokenRepository.existsByRefreshToken(refresh);
-        if(!isExist){
-            return new ResponseEntity<>(TOKEN_IS_NULL,HttpStatus.BAD_REQUEST);
+        if (!isExist) {
+            return new ResponseEntity<>(TOKEN_IS_NULL, HttpStatus.BAD_REQUEST);
         }
 
         String username = jwtUtil.getUsername(refresh);
@@ -84,11 +85,11 @@ public class ReissueService {
 
         //make new JWT
         String newAccess = jwtUtil.createJwt("access", username, authorities, 600000L);
-        String newRefresh = jwtUtil.createJwt("refresh",username,authorities,8640000L);
+        String newRefresh = jwtUtil.createJwt("refresh", username, authorities, 8640000L);
         //response
 
         refreshTokenRepository.deleteByRefreshToken(refresh);
-        addRefreshTokenUtil.addRefreshEntity(refreshTokenRepository,username,newRefresh, newAccess,86400000L);
+        addRefreshTokenUtil.addRefreshEntity(refreshTokenRepository, username, newRefresh, newAccess, 86400000L);
         response.setHeader("access", newAccess);
         //response.addCookie(createCookie ("refresh",newRefresh));
 

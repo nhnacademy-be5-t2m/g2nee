@@ -12,20 +12,20 @@ import javax.servlet.http.HttpServletResponse;
 
 @Controller
 @ResponseBody
-public class ReissueController  {
+public class ReissueController {
 
 
     private final ReissueService reissueService;
 
-    public ReissueController(ReissueService reissueService, RefreshTokenRepository refreshTokenRepository){
+    public ReissueController(ReissueService reissueService, RefreshTokenRepository refreshTokenRepository) {
 
-        this.reissueService =reissueService;
+        this.reissueService = reissueService;
     }
 
     @PostMapping("/auth/reissue")
-    public ResponseEntity<?> reissue(HttpServletRequest request, HttpServletResponse response){
+    public ResponseEntity<?> reissue(HttpServletRequest request, HttpServletResponse response) {
 
-        return reissueService.reissue(request,response);
+        return reissueService.reissue(request, response);
 
     }
 }

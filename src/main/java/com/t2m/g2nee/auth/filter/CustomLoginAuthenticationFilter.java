@@ -38,16 +38,13 @@ public class CustomLoginAuthenticationFilter extends UsernamePasswordAuthenticat
     private AddRefreshTokenUtil addRefreshTokenUtil;
 
     private final ObjectMapper objectMapper;
-    private final MemberAdaptor memberAdaptor;
 
-    public CustomLoginAuthenticationFilter(AuthenticationManager authenticationManager, JWTUtil jwtUtil, RefreshTokenRepository refreshTokenRepository, AddRefreshTokenUtil addRefreshTokenUtil, ObjectMapper objectMapper,
-                                           MemberAdaptor memberAdaptor){
+    public CustomLoginAuthenticationFilter(AuthenticationManager authenticationManager, JWTUtil jwtUtil, RefreshTokenRepository refreshTokenRepository, AddRefreshTokenUtil addRefreshTokenUtil, ObjectMapper objectMapper){
         this.authenticationManager =authenticationManager;
         this.jwtUtil = jwtUtil;
         this.refreshTokenRepository = refreshTokenRepository;
         this.addRefreshTokenUtil =addRefreshTokenUtil;
         this.objectMapper=objectMapper;
-        this.memberAdaptor = memberAdaptor;
         super.setAuthenticationManager(authenticationManager);
         super.setFilterProcessesUrl("/auth/login");
     }
@@ -68,10 +65,6 @@ public class CustomLoginAuthenticationFilter extends UsernamePasswordAuthenticat
 
         }catch (IOException e){
             throw  new MemberDTOParsingException();
-        }
-
-        if(!memberAdaptor.login(memberLoginDTO).getBody()){
-            throw new RuntimeException("login 정보가 불일치 합니다.");
         }
 
         /**
@@ -106,6 +99,7 @@ public class CustomLoginAuthenticationFilter extends UsernamePasswordAuthenticat
         httpServletResponse.setHeader("access",access);
         httpServletResponse.addCookie(createCookie("refresh",refresh));
         httpServletResponse.setStatus(HttpStatus.OK.value());
+
 
 
 

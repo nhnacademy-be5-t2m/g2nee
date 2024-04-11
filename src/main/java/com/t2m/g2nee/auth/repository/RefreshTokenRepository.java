@@ -7,14 +7,13 @@ import org.springframework.stereotype.Repository;
 import javax.transaction.Transactional;
 
 @Repository
-public interface RefreshTokenRepository extends CrudRepository<RefreshToken,Long> {
+public interface RefreshTokenRepository extends CrudRepository<RefreshToken, Long> {
 
 
     Boolean existsByRefreshToken(String refresh);
 
     @Transactional
     void deleteByRefreshToken(String refresh);
-
 
 
 }

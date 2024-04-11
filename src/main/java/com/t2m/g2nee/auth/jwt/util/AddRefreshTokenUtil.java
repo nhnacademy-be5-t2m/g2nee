@@ -11,18 +11,16 @@ public class AddRefreshTokenUtil {
 
     private RefreshTokenRepository refreshTokenRepository;
 
-    public AddRefreshTokenUtil(RefreshTokenRepository refreshTokenRepository){
+    public AddRefreshTokenUtil(RefreshTokenRepository refreshTokenRepository) {
         this.refreshTokenRepository = refreshTokenRepository;
     }
 
 
-
-    public static void addRefreshEntity(RefreshTokenRepository refreshTokenRepository,String username, String refresh, String access,Long expiredMs){
-
-
+    public static void addRefreshEntity(RefreshTokenRepository refreshTokenRepository, String username, String refresh,
+                                        String access, Long expiredMs) {
 
 
-        Date date = new Date(System.currentTimeMillis()+expiredMs);
+        Date date = new Date(System.currentTimeMillis() + expiredMs);
 
         RefreshToken refreshTokenEntity = new RefreshToken();
         refreshTokenEntity.setUsername(username);

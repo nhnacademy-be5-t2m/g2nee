@@ -20,13 +20,11 @@ import java.io.PrintWriter;
 import java.util.Collection;
 
 
-
 public class JWTFilter extends OncePerRequestFilter {
 
     private final JWTUtil jwtUtil;
 
     private final CustomUserDetailsService customUserDetailsService;
-
 
 
     public JWTFilter(JWTUtil jwtUtil, CustomUserDetailsService customUserDetailsService) {
@@ -37,24 +35,24 @@ public class JWTFilter extends OncePerRequestFilter {
 
     /**
      * DoFilter를 통한 토큰 검증
-
      */
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
 
         //헤더에서 access키에 담긴 토큰을 꺼냄
         String accessToken = request.getHeader("access");
 
         //토큰 없을 시 다음 필터로
-        if(accessToken ==null){
-            filterChain.doFilter(request,response);
+        if (accessToken == null) {
+            filterChain.doFilter(request, response);
             return;
         }
-        try{
+        try {
             jwtUtil.isExpired(accessToken);
 
-        }catch(ExpiredJwtException e){
+        } catch (ExpiredJwtException e) {
             PrintWriter writer = response.getWriter();
             writer.print("accessToken이 만료되었습니다.");
 
@@ -63,7 +61,7 @@ public class JWTFilter extends OncePerRequestFilter {
         }
         String category = jwtUtil.getCategory(accessToken);
 
-        if(!category.equals("access")){
+        if (!category.equals("access")) {
             PrintWriter writer = response.getWriter();
             writer.print("accessToken이 유효하지않습니다.");
 
