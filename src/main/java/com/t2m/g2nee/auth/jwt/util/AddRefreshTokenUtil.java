@@ -9,14 +9,14 @@ import java.util.Date;
 @Component
 public class AddRefreshTokenUtil {
 
-    private RefreshTokenRepository refreshTokenRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     public AddRefreshTokenUtil(RefreshTokenRepository refreshTokenRepository) {
         this.refreshTokenRepository = refreshTokenRepository;
     }
 
 
-    public static void addRefreshEntity(RefreshTokenRepository refreshTokenRepository, String username, String refresh,
+    public void addRefreshEntity(RefreshTokenRepository refreshTokenRepository, String username, String refresh,
                                         String access, Long expiredMs) {
 
 
@@ -24,9 +24,9 @@ public class AddRefreshTokenUtil {
 
         RefreshToken refreshTokenEntity = new RefreshToken();
         refreshTokenEntity.setUsername(username);
-        refreshTokenEntity.setExpiration(date.toString());
         refreshTokenEntity.setRefreshToken(refresh);
         refreshTokenEntity.setAccessToken(access);
+        refreshTokenEntity.setExpiration(date.toString());
 
         refreshTokenRepository.save(refreshTokenEntity);
     }

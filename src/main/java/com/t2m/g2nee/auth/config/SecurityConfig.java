@@ -10,6 +10,7 @@ import com.t2m.g2nee.auth.repository.RefreshTokenRepository;
 import com.t2m.g2nee.auth.service.memberService.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -39,6 +40,8 @@ public class SecurityConfig {
 
     private final ObjectMapper objectMapper;
     private final CustomUserDetailsService customUserDetailsService;
+
+    RedisTemplate<String, String> redisTemplate;
     public SecurityConfig(AuthenticationConfiguration authenticationConfiguration, JWTUtil jwtUtil, RefreshTokenRepository refreshTokenRepository, AddRefreshTokenUtil addRefreshTokenUtil, ObjectMapper objectMapper,
                           CustomUserDetailsService customUserDetailsService) {
         this.authenticationConfiguration = authenticationConfiguration;
@@ -101,7 +104,7 @@ public class SecurityConfig {
                 .addFilterBefore(new JWTFilter(jwtUtil,customUserDetailsService), CustomLoginAuthenticationFilter.class);
 
         http
-                .addFilterAt(new CustomLoginAuthenticationFilter(authenticationManager(authenticationConfiguration),jwtUtil,refreshTokenRepository, addRefreshTokenUtil,objectMapper), UsernamePasswordAuthenticationFilter.class);
+                .addFilterAt(new CustomLoginAuthenticationFilter(authenticationManager(authenticationConfiguration),jwtUtil,refreshTokenRepository, addRefreshTokenUtil,objectMapper, redisTemplate), UsernamePasswordAuthenticationFilter.class);
 
 
 

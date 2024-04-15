@@ -7,6 +7,7 @@ import com.t2m.g2nee.auth.exception.token.MemberDTOParsingException;
 import com.t2m.g2nee.auth.jwt.util.AddRefreshTokenUtil;
 import com.t2m.g2nee.auth.jwt.util.JWTUtil;
 import com.t2m.g2nee.auth.repository.RefreshTokenRepository;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -39,12 +40,15 @@ public class CustomLoginAuthenticationFilter extends UsernamePasswordAuthenticat
 
     private final ObjectMapper objectMapper;
 
-    public CustomLoginAuthenticationFilter(AuthenticationManager authenticationManager, JWTUtil jwtUtil, RefreshTokenRepository refreshTokenRepository, AddRefreshTokenUtil addRefreshTokenUtil, ObjectMapper objectMapper){
+    private final RedisTemplate<String,String> redisTemplate;
+
+    public CustomLoginAuthenticationFilter(AuthenticationManager authenticationManager, JWTUtil jwtUtil, RefreshTokenRepository refreshTokenRepository, AddRefreshTokenUtil addRefreshTokenUtil, ObjectMapper objectMapper, RedisTemplate<String, String> redisTemplate){
         this.authenticationManager =authenticationManager;
         this.jwtUtil = jwtUtil;
         this.refreshTokenRepository = refreshTokenRepository;
         this.addRefreshTokenUtil =addRefreshTokenUtil;
         this.objectMapper=objectMapper;
+        this.redisTemplate = redisTemplate;
         super.setAuthenticationManager(authenticationManager);
         super.setFilterProcessesUrl("/auth/login");
     }
@@ -95,7 +99,6 @@ public class CustomLoginAuthenticationFilter extends UsernamePasswordAuthenticat
         String refresh = jwtUtil.createJwt("refresh",username,authentication.getAuthorities(),86400000L);
 
         addRefreshTokenUtil.addRefreshEntity(refreshTokenRepository,username,refresh,access,86400000L);
-
         httpServletResponse.setHeader("access",access);
         httpServletResponse.addCookie(createCookie("refresh",refresh));
         httpServletResponse.setStatus(HttpStatus.OK.value());
