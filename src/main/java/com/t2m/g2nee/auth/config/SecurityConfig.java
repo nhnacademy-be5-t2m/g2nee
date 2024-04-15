@@ -3,6 +3,7 @@ package com.t2m.g2nee.auth.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.t2m.g2nee.auth.adaptor.MemberAdaptor;
 import com.t2m.g2nee.auth.filter.CustomLoginAuthenticationFilter;
+import com.t2m.g2nee.auth.filter.CustomLogoutFilter;
 import com.t2m.g2nee.auth.filter.JWTFilter;
 import com.t2m.g2nee.auth.jwt.util.AddRefreshTokenUtil;
 import com.t2m.g2nee.auth.jwt.util.JWTUtil;
@@ -19,6 +20,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
@@ -107,6 +109,7 @@ public class SecurityConfig {
                 .addFilterAt(new CustomLoginAuthenticationFilter(authenticationManager(authenticationConfiguration),jwtUtil,refreshTokenRepository, addRefreshTokenUtil,objectMapper, redisTemplate), UsernamePasswordAuthenticationFilter.class);
 
 
+        http.addFilterBefore(new CustomLogoutFilter(jwtUtil,refreshTokenRepository), LogoutFilter.class);
 
         http
                 .sessionManagement((session)-> session

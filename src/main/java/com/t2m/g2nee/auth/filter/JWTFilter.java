@@ -41,10 +41,8 @@ public class JWTFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        //헤더에서 access키에 담긴 토큰을 꺼냄
         String accessToken = request.getHeader("access");
 
-        //토큰 없을 시 다음 필터로
         if (accessToken == null) {
             filterChain.doFilter(request, response);
             return;
@@ -73,15 +71,10 @@ public class JWTFilter extends OncePerRequestFilter {
         String username = jwtUtil.getUsername(accessToken);
         Collection<? extends GrantedAuthority> authorities = jwtUtil.getAuthorities(accessToken);
 
-        // UserDetailsService를 사용하여 사용자 정보 가져오기
         UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
 
-        // Authentication 객체 생성
         Authentication authToken = new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
         SecurityContextHolder.getContext().setAuthentication(authToken);
         filterChain.doFilter(request, response);
     }
 }
-//Access 토큰 요청을 검증하는 JWTFilter에서 Access토큰이 만료된 경우 프론트 개발자와 협의된 상태 코드와 메세지 응답
-//프론트측 API클라이언트 요청시 Access토큰 만료 요청이 오면 예외문을 통해 refresh토큰을 서버측으로 전송하고 Access토큰을 발급받는 로직
-//서버 측에서는 refresh 토큰을 받을 엔드포인트(컨트롤러)를 구성해 refresh를 검증하고 Access를 응답
