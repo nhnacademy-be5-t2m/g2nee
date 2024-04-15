@@ -75,7 +75,7 @@ public class ReissueService {
             return new ResponseEntity<>(TOKEN_INVALID_MESSAGE, HttpStatus.BAD_REQUEST);
         }
 
-        Boolean isExist = refreshTokenRepository.existsByRefreshToken(refresh);
+        Boolean isExist = refreshTokenRepository.existsById(refresh);
         if (!isExist) {
             return new ResponseEntity<>(TOKEN_IS_NULL, HttpStatus.BAD_REQUEST);
         }
@@ -88,20 +88,20 @@ public class ReissueService {
         String newRefresh = jwtUtil.createJwt("refresh", username, authorities, 8640000L);
         //response
 
-        refreshTokenRepository.deleteByRefreshToken(refresh);
+        refreshTokenRepository.deleteById(refresh);
         addRefreshTokenUtil.addRefreshEntity(refreshTokenRepository, username, newRefresh, newAccess, 86400000L);
         response.setHeader("access", newAccess);
-        //response.addCookie(createCookie ("refresh",newRefresh));
+        response.addCookie(createCookie ("refresh",newRefresh));
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
-//    private Cookie createCookie(String key, String value){
-//        Cookie cookie = new Cookie(key,value);
-//        cookie.setMaxAge(24*60*60);
-//        cookie.setHttpOnly(true);
-//
-//        return cookie;
-//    }
+    private Cookie createCookie(String key, String value){
+        Cookie cookie = new Cookie(key,value);
+        cookie.setMaxAge(24*60*60);
+        cookie.setHttpOnly(true);
+
+        return cookie;
+    }
 }
 
 

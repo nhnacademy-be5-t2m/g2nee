@@ -10,10 +10,10 @@ import javax.transaction.Transactional;
 public interface RefreshTokenRepository extends CrudRepository<RefreshToken, String> {
 
 
-    Boolean existsByRefreshToken(String refreshToken);
+    boolean existsById(String refreshToken);
 
     @Transactional
-    void deleteByRefreshToken(String refreshToken);
+    void deleteById(String refreshToken);
 
 
 }
