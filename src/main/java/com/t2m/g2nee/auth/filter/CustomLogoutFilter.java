@@ -3,8 +3,6 @@ package com.t2m.g2nee.auth.filter;
 import com.t2m.g2nee.auth.jwt.util.JWTUtil;
 import com.t2m.g2nee.auth.repository.RefreshTokenRepository;
 import io.jsonwebtoken.ExpiredJwtException;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.filter.GenericFilterBean;
 
 import javax.servlet.FilterChain;

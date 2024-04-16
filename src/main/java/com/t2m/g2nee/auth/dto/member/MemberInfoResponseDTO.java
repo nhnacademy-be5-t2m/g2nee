@@ -6,7 +6,11 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-// 토큰 반환 DTO클래스
+
+
+/**
+ * 토큰 반환 DTO클래스
+ */
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor

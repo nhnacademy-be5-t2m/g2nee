@@ -13,7 +13,10 @@ import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.security.jackson2.SecurityJackson2Modules;
 
-//Redis 연결 ,Spring Security에선 JSON데이터 처리
+/**
+ * Redis 연결 ,Spring Security에선 JSON데이터 처리
+ */
+
 @Configuration
 public class RedisConfig {
 

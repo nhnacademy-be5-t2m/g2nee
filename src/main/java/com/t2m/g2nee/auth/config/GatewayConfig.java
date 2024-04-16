@@ -4,7 +4,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
-//Gateway와 연동
+/**
+ * Gateway와 연동
+ */
+
 @Configuration
 @ConfigurationProperties(prefix = "g2nee")
 public class GatewayConfig {
