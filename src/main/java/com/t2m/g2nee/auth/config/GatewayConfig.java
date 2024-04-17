@@ -5,7 +5,10 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Gateway와 연동
+ * Auth Server를 Gateway와 연동
+ *
+ * @author kimsuhyeon
+ * @version 1.0
  */
 
 @Configuration

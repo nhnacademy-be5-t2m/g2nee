@@ -13,7 +13,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-
+/**
+ * Shop Server와 멤버정보 관련해 통신하기위한 클래스
+ *
+ * @author kimsuhyeon
+ * @version 1.0
+ */
 @Slf4j
 @Component
 @AllArgsConstructor
@@ -21,8 +26,11 @@ public class MemberAdaptor {
     private final GatewayConfig gateWayConfig;
     private final RestTemplate restTemplate;
 
+
     /**
-     * shop에 Member정보 요청해 username이 담긴 MemberInfoRequest에 담음
+     * Shop Server에 Member정보 요청하는 메소드
+     * @param requestDto username이 들어있는 회원정보 요청 DTO
+     * @return Id,username,password,권한 등의 회원정보를 응답받아 리턴해준다
      */
 
     public ResponseEntity<MemberInfoResponseDTO> loginRequest(

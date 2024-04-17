@@ -4,6 +4,8 @@ import com.t2m.g2nee.auth.entity.RefreshToken;
 import com.t2m.g2nee.auth.repository.RefreshTokenRepository;
 import org.springframework.stereotype.Component;
 
+import javax.transaction.Transactional;
+
 @Component
 public class AddRefreshTokenUtil {
 
@@ -13,7 +15,7 @@ public class AddRefreshTokenUtil {
         this.refreshTokenRepository = refreshTokenRepository;
     }
 
-
+    @Transactional
     public void addRefreshEntity(RefreshTokenRepository refreshTokenRepository, String username, String refresh) {
 
 

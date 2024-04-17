@@ -1,6 +1,7 @@
 package com.t2m.g2nee.auth.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.t2m.g2nee.auth.properties.RedisProperties;
 import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -15,33 +16,25 @@ import org.springframework.security.jackson2.SecurityJackson2Modules;
 
 /**
  * Redis 연결 ,Spring Security에선 JSON데이터 처리
+ *
+ * @author kimsuhyeon
+ * @version 1.0
  */
 
 @Configuration
 public class RedisConfig {
 
-    private ClassLoader classLoader;
 
-    @Value("${spring.redis.host}")
-    private String host;
-
-    @Value("${spring.redis.port}")
-    private int port;
-
-    @Value("${spring.redis.password}")
-    private String password;
-
-    @Value("${spring.redis.database}")
-    private int database;
+   RedisProperties redisProperties = new RedisProperties();
 
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
-        redisStandaloneConfiguration.setHostName(host);
-        redisStandaloneConfiguration.setPort(port);
-        redisStandaloneConfiguration.setPassword(password);
-        redisStandaloneConfiguration.setDatabase(database);
+        redisStandaloneConfiguration.setHostName(redisProperties.getHost());
+        redisStandaloneConfiguration.setPort(redisProperties.getPort());
+        redisStandaloneConfiguration.setPassword(redisProperties.getPassword());
+        redisStandaloneConfiguration.setDatabase(redisProperties.getDatabase());
 
         LettuceConnectionFactory lettuceConnectionFactory = new LettuceConnectionFactory(redisStandaloneConfiguration);
 
@@ -61,16 +54,5 @@ public class RedisConfig {
     }
 
 }
-//    private ObjectMapper objectMapper() {
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        objectMapper.registerModules(SecurityJackson2Modules.getModules(classLoader));
-//
-//        return objectMapper;
-//    }
-//
-//    @Override
-//    public void setBeanClassLoader(ClassLoader classLoader) {
-//        this.classLoader = classLoader;
-//    }
-//}
+
 

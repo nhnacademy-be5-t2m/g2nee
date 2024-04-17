@@ -3,6 +3,7 @@ package com.t2m.g2nee.auth.dto.member;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 /**
@@ -10,10 +11,10 @@ import lombok.Setter;
  */
 
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Getter
 @Setter
 public class MemberLoginDTO {
-    String username;
-    String password;
+    private String username;
+    private String password;
 }

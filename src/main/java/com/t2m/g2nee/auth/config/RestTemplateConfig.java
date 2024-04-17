@@ -6,6 +6,12 @@ import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
+/**
+ * Redis에 토큰을 저장하기 위한 설정
+ *
+ * @author kimsuhyeon
+ * @version 1.0
+ */
 @Configuration
 public class RestTemplateConfig {
 

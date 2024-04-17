@@ -25,6 +25,12 @@ import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
+/**
+ * Security Config설정
+ *
+ * @author kimsuhyeon
+ * @version 1.0
+ */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
