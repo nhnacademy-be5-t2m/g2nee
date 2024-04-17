@@ -3,16 +3,17 @@ package com.t2m.g2nee.auth.filter;
 import com.t2m.g2nee.auth.jwt.util.JWTUtil;
 import com.t2m.g2nee.auth.repository.RefreshTokenRepository;
 import io.jsonwebtoken.ExpiredJwtException;
-import org.springframework.web.filter.GenericFilterBean;
-
+import java.io.IOException;
+import java.util.Base64;
+import java.util.Objects;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import org.json.JSONObject;
+import org.springframework.web.filter.GenericFilterBean;
 
 public class CustomLogoutFilter extends GenericFilterBean {
 
@@ -26,12 +27,14 @@ public class CustomLogoutFilter extends GenericFilterBean {
     }
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+            throws IOException, ServletException {
 
         doFilter((HttpServletRequest) request, (HttpServletResponse) response, chain);
     }
 
-    private void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException, ServletException {
+    private void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws IOException, ServletException {
 
         //path and method verify
         String requestUri = request.getRequestURI();
@@ -48,34 +51,26 @@ public class CustomLogoutFilter extends GenericFilterBean {
         }
 
         //get refresh token
-        String refresh = null;
-        Cookie[] cookies = request.getCookies();
-        for (Cookie cookie : cookies) {
-
-            if (cookie.getName().equals("refresh")) {
-
-                refresh = cookie.getValue();
-            }
-        }
+        String access =
+                Objects.requireNonNull(request.getHeaders("Authorization").nextElement().substring("Bearer ".length()));
 
         //refresh null check
-        if (refresh == null) {
+        if (access == null) {
 
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
 
-        //expired check
-        try {
-            jwtUtil.isExpired(refresh);
-        } catch (ExpiredJwtException e) {
+        String username = getUsernameFromAccessToken(access);
 
-            //response status code
+        Boolean isExist = refreshTokenRepository.existsById(username);
+        if (!isExist) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
+        String refreshToken = String.valueOf(refreshTokenRepository.findById(username).get().getRefreshToken());
+        String category = jwtUtil.getCategory(refreshToken);
 
-        String category = jwtUtil.getCategory(refresh);
         if (!category.equals("refresh")) {
 
             //response status code
@@ -83,23 +78,30 @@ public class CustomLogoutFilter extends GenericFilterBean {
             return;
         }
 
-        Boolean isExist = refreshTokenRepository.existsById(refresh);
-        if (!isExist) {
+        //expired check
+        try {
+            jwtUtil.isExpired(refreshToken);
+        } catch (ExpiredJwtException e) {
 
+            //response status code
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
 
 
-        refreshTokenRepository.deleteById(refresh);
+        refreshTokenRepository.deleteById(username);
 
-        Cookie cookie = new Cookie("refresh", null);
-        cookie.setMaxAge(0);
-        cookie.setPath("/");
-
-        response.addCookie(cookie);
         response.setStatus(HttpServletResponse.SC_OK);
 
+    }
+
+    public static String getUsernameFromAccessToken(String accessToken) {
+        Base64.Decoder decoder = Base64.getUrlDecoder();
+        String[] access_chunks = accessToken.split("\\.");
+        String access_payload = new String(decoder.decode(access_chunks[1]));
+        JSONObject aObject = new JSONObject(access_payload);
+        String username = aObject.getString("username");
+        return username;
     }
 }
 
