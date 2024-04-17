@@ -1,19 +1,20 @@
 package com.t2m.g2nee.auth.service.tokenService;
 
+import static com.t2m.g2nee.auth.filter.CustomLogoutFilter.getUsernameFromAccessToken;
+
 import com.t2m.g2nee.auth.jwt.util.AddRefreshTokenUtil;
 import com.t2m.g2nee.auth.jwt.util.JWTUtil;
 import com.t2m.g2nee.auth.repository.RefreshTokenRepository;
 import io.jsonwebtoken.ExpiredJwtException;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.stereotype.Service;
-
+import java.util.Collection;
+import java.util.Objects;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Collection;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.stereotype.Service;
 
 @Service
 public class ReissueService {
@@ -41,63 +42,58 @@ public class ReissueService {
 
     public ResponseEntity<?> reissue(HttpServletRequest request, HttpServletResponse response) {
 
-        String refresh = null;
+        //get refresh token
+        String access =
+                Objects.requireNonNull(request.getHeaders("Authorization").nextElement().substring("Bearer ".length()));
 
-        Cookie[] cookies = request.getCookies();
-        for (Cookie cookie : cookies) {
+        //refresh null check
+        if (access == null) {
 
-            if (cookie.getName().equals("refresh")) {
-
-                refresh = cookie.getValue();
-            }
+            return new ResponseEntity<>(TOKEN_IS_NULL, HttpStatus.BAD_REQUEST);
         }
-        //!!!!!!!db에서 꺼내오는걸로
 
-        if (refresh == null) {
+        String username = getUsernameFromAccessToken(access);
 
+        Boolean isExist = refreshTokenRepository.existsById(username);
+        if (!isExist) {
+            return new ResponseEntity<>(TOKEN_INVALID_MESSAGE, HttpStatus.BAD_REQUEST);
+        }
+        String refreshToken = String.valueOf(refreshTokenRepository.findById(username).get().getRefreshToken());
+        String category = jwtUtil.getCategory(refreshToken);
+
+        if (!category.equals("refresh")) {
+
+            //response status code
             return new ResponseEntity<>(TOKEN_IS_NULL, HttpStatus.BAD_REQUEST);
         }
 
         //expired check
         try {
-            jwtUtil.isExpired(refresh);
+            jwtUtil.isExpired(refreshToken);
         } catch (ExpiredJwtException e) {
 
             //response status code
             return new ResponseEntity<>(TOKEN_EXPIRED_MESSAGE, HttpStatus.BAD_REQUEST);
         }
+        response.setStatus(HttpServletResponse.SC_OK);
 
-        // 토큰이 refresh인지 확인 (발급시 페이로드에 명시)
-        String category = jwtUtil.getCategory(refresh);
-
-        if (!category.equals("refresh")) {
-
-            return new ResponseEntity<>(TOKEN_INVALID_MESSAGE, HttpStatus.BAD_REQUEST);
-        }
-
-        Boolean isExist = refreshTokenRepository.existsById(refresh);
-        if (!isExist) {
-            return new ResponseEntity<>(TOKEN_IS_NULL, HttpStatus.BAD_REQUEST);
-        }
-
-        String username = jwtUtil.getUsername(refresh);
-        Collection<? extends GrantedAuthority> authorities = jwtUtil.getAuthorities(refresh);
+        Collection<? extends GrantedAuthority> authorities = jwtUtil.getAuthorities(access);
 
         //make new JWT
         String newAccess = jwtUtil.createJwt("access", username, authorities, 600000L);
         String newRefresh = jwtUtil.createJwt("refresh", username, authorities, 8640000L);
-        //response
 
-        refreshTokenRepository.deleteById(refresh);
-        addRefreshTokenUtil.addRefreshEntity(refreshTokenRepository, username, newRefresh, newAccess, 86400000L);
+        //response
+        addRefreshTokenUtil.addRefreshEntity(refreshTokenRepository, username, newRefresh);
         response.setHeader("access", newAccess);
-        response.addCookie(createCookie ("refresh",newRefresh));
+        response.addCookie(createCookie("refresh", newRefresh));
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
-    private Cookie createCookie(String key, String value){
-        Cookie cookie = new Cookie(key,value);
-        cookie.setMaxAge(24*60*60);
+
+    private Cookie createCookie(String key, String value) {
+        Cookie cookie = new Cookie(key, value);
+        cookie.setMaxAge(24 * 60 * 60);
         cookie.setHttpOnly(true);
 
         return cookie;
