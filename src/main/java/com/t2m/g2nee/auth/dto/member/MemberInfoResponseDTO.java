@@ -1,11 +1,9 @@
 package com.t2m.g2nee.auth.dto.member;
 
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
-
 
 
 /**

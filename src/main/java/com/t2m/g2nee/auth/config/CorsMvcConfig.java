@@ -6,8 +6,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class CorsMvcConfig implements WebMvcConfigurer {
 
     /**
-     *  프론트에서 요청이 오는 주소 설정
-     *
+     * 프론트에서 요청이 오는 주소 설정
      */
     @Override
     public void addCorsMappings(CorsRegistry corsRegistry) {

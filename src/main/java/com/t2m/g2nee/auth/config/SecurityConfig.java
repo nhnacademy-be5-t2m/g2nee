@@ -1,7 +1,6 @@
 package com.t2m.g2nee.auth.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.t2m.g2nee.auth.adaptor.MemberAdaptor;
 import com.t2m.g2nee.auth.filter.CustomLoginAuthenticationFilter;
 import com.t2m.g2nee.auth.filter.CustomLogoutFilter;
 import com.t2m.g2nee.auth.filter.JWTFilter;
@@ -9,6 +8,8 @@ import com.t2m.g2nee.auth.jwt.util.AddRefreshTokenUtil;
 import com.t2m.g2nee.auth.jwt.util.JWTUtil;
 import com.t2m.g2nee.auth.repository.RefreshTokenRepository;
 import com.t2m.g2nee.auth.service.memberService.CustomUserDetailsService;
+import java.util.Collections;
+import javax.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -24,13 +25,9 @@ import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.Collections;
-
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-
 
 
     private final AuthenticationConfiguration authenticationConfiguration;
@@ -44,22 +41,27 @@ public class SecurityConfig {
     private final CustomUserDetailsService customUserDetailsService;
 
     RedisTemplate<String, String> redisTemplate;
-    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration, JWTUtil jwtUtil, RefreshTokenRepository refreshTokenRepository, AddRefreshTokenUtil addRefreshTokenUtil, ObjectMapper objectMapper,
+
+    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration, JWTUtil jwtUtil,
+                          RefreshTokenRepository refreshTokenRepository, AddRefreshTokenUtil addRefreshTokenUtil,
+                          ObjectMapper objectMapper,
                           CustomUserDetailsService customUserDetailsService) {
         this.authenticationConfiguration = authenticationConfiguration;
-        this.jwtUtil =jwtUtil;
-        this.refreshTokenRepository=refreshTokenRepository;
+        this.jwtUtil = jwtUtil;
+        this.refreshTokenRepository = refreshTokenRepository;
         this.addRefreshTokenUtil = addRefreshTokenUtil;
-        this.objectMapper=objectMapper;
+        this.objectMapper = objectMapper;
         this.customUserDetailsService = customUserDetailsService;
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
+            throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
+
     @Bean
-    public BCryptPasswordEncoder bCryptPasswordEncoder(){
+    public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
@@ -68,13 +70,15 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
-                .cors((cors)-> cors
+                .cors((cors) -> cors
                         .configurationSource(new CorsConfigurationSource() {
                             @Override
                             public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
                                 CorsConfiguration configuration = new CorsConfiguration();
-                                configuration.setAllowedOrigins(Collections.singletonList("http://133.186.208.183:8100/"));
-                                configuration.setAllowedOrigins(Collections.singletonList("http://g2nee:g2nee@133.186.150.129:8761/eureka"));
+                                configuration.setAllowedOrigins(
+                                        Collections.singletonList("http://133.186.208.183:8100/"));
+                                configuration.setAllowedOrigins(
+                                        Collections.singletonList("http://g2nee:g2nee@133.186.150.129:8761/eureka"));
                                 configuration.setAllowedMethods(Collections.singletonList("*"));
                                 configuration.setAllowCredentials(true);
                                 configuration.setAllowedHeaders(Collections.singletonList("*"));
@@ -88,11 +92,10 @@ public class SecurityConfig {
         http
                 .csrf((auth) -> auth.disable());
         http
-                .formLogin((auth)-> auth.disable());
+                .formLogin((auth) -> auth.disable());
 
         http
-                .httpBasic((auth)-> auth.disable());
-
+                .httpBasic((auth) -> auth.disable());
 
 
 //        http
@@ -107,18 +110,21 @@ public class SecurityConfig {
                 .logoutSuccessUrl("/auth/login");
 
 
+        http
+                .addFilterBefore(new JWTFilter(jwtUtil, customUserDetailsService),
+                        CustomLoginAuthenticationFilter.class);
 
         http
-                .addFilterBefore(new JWTFilter(jwtUtil,customUserDetailsService), CustomLoginAuthenticationFilter.class);
+                .addFilterAt(
+                        new CustomLoginAuthenticationFilter(authenticationManager(authenticationConfiguration), jwtUtil,
+                                refreshTokenRepository, addRefreshTokenUtil, objectMapper, redisTemplate),
+                        UsernamePasswordAuthenticationFilter.class);
+
+
+        http.addFilterBefore(new CustomLogoutFilter(jwtUtil, refreshTokenRepository), LogoutFilter.class);
 
         http
-                .addFilterAt(new CustomLoginAuthenticationFilter(authenticationManager(authenticationConfiguration),jwtUtil,refreshTokenRepository, addRefreshTokenUtil,objectMapper, redisTemplate), UsernamePasswordAuthenticationFilter.class);
-
-
-        http.addFilterBefore(new CustomLogoutFilter(jwtUtil,refreshTokenRepository), LogoutFilter.class);
-
-        http
-                .sessionManagement((session)-> session
+                .sessionManagement((session) -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 );
 
