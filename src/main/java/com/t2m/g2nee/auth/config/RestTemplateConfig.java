@@ -9,7 +9,7 @@ import org.springframework.web.client.RestTemplate;
 /**
  * Redis에 토큰을 저장하기 위한 설정
  *
- * @author kimsuhyeon
+ * @author 김수현
  * @version 1.0
  */
 @Configuration

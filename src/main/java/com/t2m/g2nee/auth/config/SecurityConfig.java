@@ -28,7 +28,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 /**
  * Security Config설정
  *
- * @author kimsuhyeon
+ * @author 김수현
  * @version 1.0
  */
 @Configuration

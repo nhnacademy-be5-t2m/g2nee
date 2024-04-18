@@ -17,7 +17,7 @@ import org.springframework.security.jackson2.SecurityJackson2Modules;
 /**
  * Redis 연결 ,Spring Security에선 JSON데이터 처리
  *
- * @author kimsuhyeon
+ * @author 김수현
  * @version 1.0
  */
 
@@ -25,8 +25,11 @@ import org.springframework.security.jackson2.SecurityJackson2Modules;
 public class RedisConfig {
 
 
-   RedisProperties redisProperties = new RedisProperties();
+    private RedisProperties redisProperties;
 
+    public RedisConfig(RedisProperties redisProperties){
+        this.redisProperties = redisProperties;
+    }
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {

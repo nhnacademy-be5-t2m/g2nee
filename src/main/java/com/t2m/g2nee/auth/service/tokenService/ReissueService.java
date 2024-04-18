@@ -16,10 +16,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 
+/**
+ * Token Reissue Service
+ * @author 김수현, 정지은
+ */
 @Service
 public class ReissueService {
 
-    private static final String EXP_MESSAGE = "다시 로그인 하세요.";
+
     private static final String TOKEN_EXPIRED_MESSAGE = "토큰이 만료되었습니다.";
 
     private static final String TOKEN_INVALID_MESSAGE = "유효하지않은 토큰입니다";

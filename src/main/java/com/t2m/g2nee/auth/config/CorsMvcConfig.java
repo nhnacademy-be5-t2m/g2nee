@@ -8,7 +8,7 @@ public class CorsMvcConfig implements WebMvcConfigurer {
     /**
      * 프론트에서 요청이 오는 주소 설정
      *
-     * @author kimsuhyeon
+     * @author 김수현
      * @version 1.0
      */
     @Override

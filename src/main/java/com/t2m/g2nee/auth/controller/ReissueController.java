@@ -11,6 +11,13 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+/**
+ * Token Reissue Controller
+ *
+ * @author 김수현
+ * @version 1.0
+ *
+ */
 @RestController
 public class ReissueController {
 
