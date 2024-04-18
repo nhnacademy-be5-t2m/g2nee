@@ -47,9 +47,9 @@ public class MemberAdaptor {
         );
     }
 
-    public ResponseEntity<Boolean> login(MemberLoginDTO memberLoginDTO){
+    public ResponseEntity<Boolean> login(MemberLoginDTO memberLoginDTO) {
         HttpHeaders headers = new HttpHeaders();
-        HttpEntity<MemberLoginDTO> entity = new HttpEntity<>(memberLoginDTO,headers);
+        HttpEntity<MemberLoginDTO> entity = new HttpEntity<>(memberLoginDTO, headers);
 
         return restTemplate.exchange(
                 gateWayConfig.getGatewayUrl() + "shop/member/login",

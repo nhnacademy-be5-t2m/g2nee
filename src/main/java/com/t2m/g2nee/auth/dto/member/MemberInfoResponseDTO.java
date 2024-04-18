@@ -1,11 +1,8 @@
 package com.t2m.g2nee.auth.dto.member;
 
 import java.util.List;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Required;
 
 
 /**
@@ -15,7 +12,6 @@ import org.springframework.beans.factory.annotation.Required;
  *
  */
 @Getter
-@RequiredArgsConstructor
 @NoArgsConstructor
 public class MemberInfoResponseDTO {
     private Long memberId;
