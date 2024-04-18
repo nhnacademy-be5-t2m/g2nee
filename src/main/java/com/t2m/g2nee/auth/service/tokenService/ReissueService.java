@@ -81,7 +81,7 @@ public class ReissueService {
         }
         response.setStatus(HttpServletResponse.SC_OK);
 
-        Collection<? extends GrantedAuthority> authorities = jwtUtil.getAuthorities(access);
+        Collection<? extends GrantedAuthority> authorities = jwtUtil.getAuthorities(refreshToken);
 
         //make new JWT
         String newAccess = jwtUtil.createJwt("access", username, authorities, 600000L);
