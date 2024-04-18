@@ -29,8 +29,9 @@ public class MemberAdaptor {
 
     /**
      * Shop Server에 Member정보 요청하는 메소드
+     *
      * @param requestDto username이 들어있는 회원정보 요청 DTO
-     * @return Id,username,password,권한 등의 회원정보를 응답받아 리턴해준다
+     * @return Id, username, password, 권한 등의 회원정보를 응답받아 리턴해준다
      */
 
     public ResponseEntity<MemberInfoResponseDTO> loginRequest(
