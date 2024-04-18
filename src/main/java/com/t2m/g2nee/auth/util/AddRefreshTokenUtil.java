@@ -1,10 +1,9 @@
-package com.t2m.g2nee.auth.jwt.util;
+package com.t2m.g2nee.auth.util;
 
 import com.t2m.g2nee.auth.entity.RefreshToken;
 import com.t2m.g2nee.auth.repository.RefreshTokenRepository;
-import org.springframework.stereotype.Component;
-
 import javax.transaction.Transactional;
+import org.springframework.stereotype.Component;
 
 @Component
 public class AddRefreshTokenUtil {

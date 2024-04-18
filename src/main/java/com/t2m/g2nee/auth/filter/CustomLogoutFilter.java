@@ -1,7 +1,7 @@
 package com.t2m.g2nee.auth.filter;
 
-import com.t2m.g2nee.auth.jwt.util.JWTUtil;
 import com.t2m.g2nee.auth.repository.RefreshTokenRepository;
+import com.t2m.g2nee.auth.util.JWTUtil;
 import io.jsonwebtoken.ExpiredJwtException;
 import java.io.IOException;
 import java.util.Base64;
