@@ -7,10 +7,9 @@ import org.springframework.context.annotation.Configuration;
 /**
  * Auth Server를 Gateway와 연동
  *
- * @author kimsuhyeon
+ * @author 김수현
  * @version 1.0
  */
-
 @Configuration
 @ConfigurationProperties(prefix = "g2nee")
 public class GatewayConfig {

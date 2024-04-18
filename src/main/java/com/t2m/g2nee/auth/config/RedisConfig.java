@@ -14,16 +14,16 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 /**
  * Redis 연결 ,Spring Security에선 JSON데이터 처리
  *
- * @author kimsuhyeon
+ * @author 김수현
  * @version 1.0
  */
 
 @Configuration
 public class RedisConfig {
 
+
     @Autowired
     RedisProperties redisProperties;
-
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {

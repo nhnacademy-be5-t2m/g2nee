@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 
 /**
  * 토큰 반환 DTO클래스
+ *
+ * @author 김수현
  */
 @Getter
 @NoArgsConstructor

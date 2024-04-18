@@ -1,23 +1,22 @@
 package com.t2m.g2nee.auth.filter;
 
 
-import com.t2m.g2nee.auth.jwt.util.JWTUtil;
 import com.t2m.g2nee.auth.service.memberService.CustomUserDetailsService;
+import com.t2m.g2nee.auth.util.JWTUtil;
 import io.jsonwebtoken.ExpiredJwtException;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Collection;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.filter.OncePerRequestFilter;
-
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.Collection;
 
 
 public class JWTFilter extends OncePerRequestFilter {

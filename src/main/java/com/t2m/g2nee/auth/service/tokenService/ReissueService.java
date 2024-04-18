@@ -2,9 +2,10 @@ package com.t2m.g2nee.auth.service.tokenService;
 
 import static com.t2m.g2nee.auth.filter.CustomLogoutFilter.getUsernameFromAccessToken;
 
-import com.t2m.g2nee.auth.jwt.util.AddRefreshTokenUtil;
-import com.t2m.g2nee.auth.jwt.util.JWTUtil;
+import com.t2m.g2nee.auth.errorCode.ErrorResponse;
 import com.t2m.g2nee.auth.repository.RefreshTokenRepository;
+import com.t2m.g2nee.auth.util.AddRefreshTokenUtil;
+import com.t2m.g2nee.auth.util.JWTUtil;
 import io.jsonwebtoken.ExpiredJwtException;
 import java.util.Collection;
 import java.util.Objects;
@@ -16,10 +17,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 
+/**
+ * Token Reissue Service
+ *
+ * @author 김수현, 정지은
+ */
 @Service
 public class ReissueService {
 
-    private static final String EXP_MESSAGE = "다시 로그인 하세요.";
+
     private static final String TOKEN_EXPIRED_MESSAGE = "토큰이 만료되었습니다.";
 
     private static final String TOKEN_INVALID_MESSAGE = "유효하지않은 토큰입니다";
@@ -56,28 +62,26 @@ public class ReissueService {
 
         Boolean isExist = refreshTokenRepository.existsById(username);
         if (!isExist) {
-            return new ResponseEntity<>(TOKEN_INVALID_MESSAGE, HttpStatus.BAD_REQUEST);
+            return makeResponse(TOKEN_INVALID_MESSAGE, HttpStatus.BAD_REQUEST);
         }
         String refreshToken = String.valueOf(refreshTokenRepository.findById(username).get().getRefreshToken());
-        String category = jwtUtil.getCategory(refreshToken);
 
-        if (!category.equals("refresh")) {
-
-            //response status code
-            return new ResponseEntity<>(TOKEN_IS_NULL, HttpStatus.BAD_REQUEST);
-        }
-
-        //expired check
         try {
             jwtUtil.isExpired(refreshToken);
         } catch (ExpiredJwtException e) {
-
-            //response status code
-            return new ResponseEntity<>(TOKEN_EXPIRED_MESSAGE, HttpStatus.BAD_REQUEST);
+            return makeResponse(TOKEN_EXPIRED_MESSAGE, HttpStatus.BAD_REQUEST);
         }
+        String category = jwtUtil.getCategory(refreshToken);
+
+        if (!category.equals("refresh")) {
+            return makeResponse(TOKEN_IS_NULL, HttpStatus.BAD_REQUEST);
+        }
+
+        //expired check
+
         response.setStatus(HttpServletResponse.SC_OK);
 
-        Collection<? extends GrantedAuthority> authorities = jwtUtil.getAuthorities(access);
+        Collection<? extends GrantedAuthority> authorities = jwtUtil.getAuthorities(refreshToken);
 
         //make new JWT
         String newAccess = jwtUtil.createJwt("access", username, authorities, 600000L);
@@ -97,6 +101,14 @@ public class ReissueService {
         cookie.setHttpOnly(true);
 
         return cookie;
+    }
+
+    private ResponseEntity<ErrorResponse> makeResponse(String message, HttpStatus httpStatus) {
+        ErrorResponse response = ErrorResponse.builder()
+                .code(httpStatus.value())
+                .message(message)
+                .build();
+        return ResponseEntity.status(httpStatus).body(response);
     }
 }
 

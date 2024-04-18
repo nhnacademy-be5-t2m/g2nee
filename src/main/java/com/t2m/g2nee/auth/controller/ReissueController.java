@@ -2,15 +2,18 @@ package com.t2m.g2nee.auth.controller;
 
 import com.t2m.g2nee.auth.repository.RefreshTokenRepository;
 import com.t2m.g2nee.auth.service.tokenService.ReissueService;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Token Reissue Controller
+ *
+ * @author 김수현
+ * @version 1.0
+ */
 @RestController
 public class ReissueController {
 
@@ -28,4 +31,5 @@ public class ReissueController {
         return reissueService.reissue(request, response);
 
     }
+
 }

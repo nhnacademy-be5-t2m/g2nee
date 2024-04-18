@@ -16,7 +16,7 @@ import org.springframework.web.client.RestTemplate;
 /**
  * Shop Server와 멤버정보 관련해 통신하기위한 클래스
  *
- * @author kimsuhyeon
+ * @author 김수현
  * @version 1.0
  */
 @Slf4j

@@ -15,13 +15,13 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "g2nee.redis")
 public class RedisProperties {
 
-    String host;
+    private String host;
 
-    int port;
+    private int port;
 
-    String password;
+    private String password;
 
-    int database;
+    private int database;
 
 
 }
