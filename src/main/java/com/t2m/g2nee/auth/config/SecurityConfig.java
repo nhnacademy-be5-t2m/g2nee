@@ -103,14 +103,6 @@ public class SecurityConfig {
         http
                 .httpBasic((auth) -> auth.disable());
 
-
-//        http
-//                .authorizeHttpRequests((auth)-> auth
-//                        .antMatchers("/auth/login").permitAll()
-//                        .antMatchers("/auth/reissue").permitAll()
-//                        .anyRequest().authenticated());
-
-//
         http.logout()
                 .logoutUrl("/auth/logout")
                 .logoutSuccessUrl("/auth/login");
