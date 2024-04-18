@@ -21,12 +21,9 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @Configuration
 public class RedisConfig {
 
+
     @Autowired
     RedisProperties redisProperties;
-
-    public RedisConfig(RedisProperties redisProperties) {
-        this.redisProperties = redisProperties;
-    }
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
