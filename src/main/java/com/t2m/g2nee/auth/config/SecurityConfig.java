@@ -104,8 +104,8 @@ public class SecurityConfig {
                 .httpBasic((auth) -> auth.disable());
 
         http.logout()
-                .logoutUrl("/auth/logout")
-                .logoutSuccessUrl("/auth/login");
+                .logoutUrl("/api/v1/auth/logout")
+                .logoutSuccessUrl("/api/v1/auth/login");
 
 
         http

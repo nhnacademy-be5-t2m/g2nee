@@ -52,7 +52,7 @@ public class CustomLoginAuthenticationFilter extends UsernamePasswordAuthenticat
         this.objectMapper = objectMapper;
         this.redisTemplate = redisTemplate;
         super.setAuthenticationManager(authenticationManager);
-        super.setFilterProcessesUrl("/auth/login");
+        super.setFilterProcessesUrl("/api/v1/auth/login");
     }
 
     @Override

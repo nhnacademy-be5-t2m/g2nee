@@ -41,7 +41,7 @@ public class MemberAdaptor {
         HttpEntity<MemberInfoRequestDTO> entity = new HttpEntity<>(requestDto, headers);
 
         return restTemplate.exchange(
-                gateWayConfig.getGatewayUrl() + "shop/member/getInfo",
+                gateWayConfig.getGatewayUrl() + "/member/getInfo",
                 HttpMethod.POST,
                 entity,
                 MemberInfoResponseDTO.class
@@ -53,7 +53,7 @@ public class MemberAdaptor {
         HttpEntity<MemberLoginDTO> entity = new HttpEntity<>(memberLoginDTO, headers);
 
         return restTemplate.exchange(
-                gateWayConfig.getGatewayUrl() + "shop/member/login",
+                gateWayConfig.getGatewayUrl() + "/member/login",
                 HttpMethod.POST,
                 entity,
                 Boolean.class
