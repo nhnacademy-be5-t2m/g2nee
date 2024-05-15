@@ -54,27 +54,39 @@ public class ReissueService {
 
         //refresh null check
         if (access == null) {
+            return makeResponse(TOKEN_IS_NULL);
+        }
 
-            return new ResponseEntity<>(TOKEN_IS_NULL, HttpStatus.BAD_REQUEST);
+        //들어온 accessToken이 유효한 토큰인지 확인
+        if (jwtUtil.isValidateToken(access)) {
+            return makeResponse(TOKEN_INVALID_MESSAGE);
         }
 
         String username = getUsernameFromAccessToken(access);
 
         Boolean isExist = refreshTokenRepository.existsById(username);
         if (!isExist) {
-            return makeResponse(TOKEN_INVALID_MESSAGE, HttpStatus.BAD_REQUEST);
+            return makeResponse(TOKEN_INVALID_MESSAGE);
         }
         String refreshToken = String.valueOf(refreshTokenRepository.findById(username).get().getRefreshToken());
+        String currentAccessToken =
+                String.valueOf(refreshTokenRepository.findById(username).get().getCurrentAccessToken());
+
+        //재발급이 되어있는 accessToken인지 확인
+        if (!access.equals(currentAccessToken)) {
+            refreshTokenRepository.deleteById(username);
+            return makeResponse(TOKEN_IS_NULL);
+        }
 
         try {
             jwtUtil.isExpired(refreshToken);
         } catch (ExpiredJwtException e) {
-            return makeResponse(TOKEN_EXPIRED_MESSAGE, HttpStatus.BAD_REQUEST);
+            return makeResponse(TOKEN_EXPIRED_MESSAGE);
         }
         String category = jwtUtil.getCategory(refreshToken);
 
         if (!category.equals("refresh")) {
-            return makeResponse(TOKEN_IS_NULL, HttpStatus.BAD_REQUEST);
+            return makeResponse(TOKEN_IS_NULL);
         }
 
         //expired check
@@ -88,7 +100,7 @@ public class ReissueService {
         String newRefresh = jwtUtil.createJwt("refresh", username, authorities, 8640000L);
 
         //response
-        addRefreshTokenUtil.addRefreshEntity(refreshTokenRepository, username, newRefresh);
+        addRefreshTokenUtil.addRefreshEntity(refreshTokenRepository, username, newRefresh, newAccess);
         response.setHeader("access", newAccess);
         response.addCookie(createCookie("refresh", newRefresh));
 
@@ -103,12 +115,12 @@ public class ReissueService {
         return cookie;
     }
 
-    private ResponseEntity<ErrorResponse> makeResponse(String message, HttpStatus httpStatus) {
+    private ResponseEntity<ErrorResponse> makeResponse(String message) {
         ErrorResponse response = ErrorResponse.builder()
-                .code(httpStatus.value())
+                .code(HttpStatus.UNAUTHORIZED.value())
                 .message(message)
                 .build();
-        return ResponseEntity.status(httpStatus).body(response);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
     }
 }
 
