@@ -15,12 +15,14 @@ public class AddRefreshTokenUtil {
     }
 
     @Transactional
-    public void addRefreshEntity(RefreshTokenRepository refreshTokenRepository, String username, String refresh) {
+    public void addRefreshEntity(RefreshTokenRepository refreshTokenRepository, String username, String refresh,
+                                 String access) {
 
 
         RefreshToken refreshTokenEntity = new RefreshToken();
         refreshTokenEntity.setUsername(username);
         refreshTokenEntity.setRefreshToken(refresh);
+        refreshTokenEntity.setCurrentAccessToken(access);
 
         refreshTokenRepository.save(refreshTokenEntity);
     }

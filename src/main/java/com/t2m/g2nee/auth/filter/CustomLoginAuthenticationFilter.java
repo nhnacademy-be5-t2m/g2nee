@@ -105,7 +105,7 @@ public class CustomLoginAuthenticationFilter extends UsernamePasswordAuthenticat
         String access = jwtUtil.createJwt("access", username, authentication.getAuthorities(), 600000L);
         String refresh = jwtUtil.createJwt("refresh", username, authentication.getAuthorities(), 86400000L);
 
-        addRefreshTokenUtil.addRefreshEntity(refreshTokenRepository, username, refresh);
+        addRefreshTokenUtil.addRefreshEntity(refreshTokenRepository, username, refresh, access);
         httpServletResponse.setHeader("access", access);
         httpServletResponse.addCookie(createCookie("refresh", refresh));
         httpServletResponse.setStatus(HttpStatus.OK.value());
