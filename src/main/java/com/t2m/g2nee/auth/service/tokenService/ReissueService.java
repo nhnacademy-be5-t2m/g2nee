@@ -58,7 +58,7 @@ public class ReissueService {
         }
 
         //들어온 accessToken이 유효한 토큰인지 확인
-        if (jwtUtil.isValidateToken(access)) {
+        if (!jwtUtil.isValidateToken(access)) {
             return makeResponse(TOKEN_INVALID_MESSAGE);
         }
 
