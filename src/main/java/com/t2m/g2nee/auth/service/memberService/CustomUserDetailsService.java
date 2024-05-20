@@ -44,9 +44,11 @@ public class CustomUserDetailsService implements UserDetailsService {
                 memberInfoResponseDTO.getAuthorities().stream().map(SimpleGrantedAuthority::new)
                         .collect(Collectors.toList());
 
+        User user =
+                new User(memberInfoResponseDTO.getUsername().toString(), memberInfoResponseDTO.getPassword().toString(),
+                        grantedAuthorities);
 
-        return new User(memberInfoResponseDTO.getUsername().toString(), memberInfoResponseDTO.getPassword().toString(),
-                grantedAuthorities);
 
+        return user;
     }
 }

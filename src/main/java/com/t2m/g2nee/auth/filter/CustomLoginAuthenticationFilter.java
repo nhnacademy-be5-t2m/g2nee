@@ -1,9 +1,14 @@
 package com.t2m.g2nee.auth.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.t2m.g2nee.auth.adaptor.MemberAdaptor;
+import com.t2m.g2nee.auth.dto.member.MemberInfoRequestDTO;
+import com.t2m.g2nee.auth.dto.member.MemberInfoResponseDTO;
 import com.t2m.g2nee.auth.dto.member.MemberLoginDTO;
+import com.t2m.g2nee.auth.exception.member.NotMemberOfG2nee;
 import com.t2m.g2nee.auth.exception.token.MemberDTOParsingException;
 import com.t2m.g2nee.auth.repository.RefreshTokenRepository;
+import com.t2m.g2nee.auth.service.EmailService;
 import com.t2m.g2nee.auth.util.AddRefreshTokenUtil;
 import com.t2m.g2nee.auth.util.JWTUtil;
 import java.io.IOException;
@@ -15,12 +20,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.client.HttpClientErrorException;
 
 //
 
@@ -40,17 +47,22 @@ public class CustomLoginAuthenticationFilter extends UsernamePasswordAuthenticat
     private final ObjectMapper objectMapper;
 
     private final RedisTemplate<String, String> redisTemplate;
+    private final MemberAdaptor memberAdaptor;
+    private final EmailService emailService;
 
     public CustomLoginAuthenticationFilter(AuthenticationManager authenticationManager, JWTUtil jwtUtil,
                                            RefreshTokenRepository refreshTokenRepository,
                                            AddRefreshTokenUtil addRefreshTokenUtil, ObjectMapper objectMapper,
-                                           RedisTemplate<String, String> redisTemplate) {
+                                           RedisTemplate<String, String> redisTemplate, MemberAdaptor memberAdaptor,
+                                           EmailService emailService) {
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
         this.refreshTokenRepository = refreshTokenRepository;
         this.addRefreshTokenUtil = addRefreshTokenUtil;
         this.objectMapper = objectMapper;
         this.redisTemplate = redisTemplate;
+        this.memberAdaptor = memberAdaptor;
+        this.emailService = emailService;
         super.setAuthenticationManager(authenticationManager);
         super.setFilterProcessesUrl("/api/v1/auth/login");
     }
@@ -96,6 +108,21 @@ public class CustomLoginAuthenticationFilter extends UsernamePasswordAuthenticat
         //로그인 완료시 successAuthentication 메서드 또는 SuccessHandler에서 Access/Refresh
 
         String username = authentication.getName();
+
+        ResponseEntity<MemberInfoResponseDTO> memberData;
+        try {
+            memberData = memberAdaptor.loginRequest(new MemberInfoRequestDTO(username));
+
+        } catch (HttpClientErrorException e) {
+            throw new NotMemberOfG2nee();
+        }
+        MemberInfoResponseDTO memberInfoResponseDTO = memberData.getBody();
+
+        try {
+            emailService.sendSimpleMessage(memberInfoResponseDTO.getEmail());
+        } catch (Exception e) {
+
+        }
 
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         Iterator<? extends GrantedAuthority> iterator = authorities.iterator();

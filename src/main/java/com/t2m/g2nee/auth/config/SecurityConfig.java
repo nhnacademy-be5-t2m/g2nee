@@ -1,10 +1,12 @@
 package com.t2m.g2nee.auth.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.t2m.g2nee.auth.adaptor.MemberAdaptor;
 import com.t2m.g2nee.auth.filter.CustomLoginAuthenticationFilter;
 import com.t2m.g2nee.auth.filter.CustomLogoutFilter;
 import com.t2m.g2nee.auth.filter.JWTFilter;
 import com.t2m.g2nee.auth.repository.RefreshTokenRepository;
+import com.t2m.g2nee.auth.service.EmailService;
 import com.t2m.g2nee.auth.service.memberService.CustomUserDetailsService;
 import com.t2m.g2nee.auth.util.AddRefreshTokenUtil;
 import com.t2m.g2nee.auth.util.JWTUtil;
@@ -47,17 +49,23 @@ public class SecurityConfig {
     private final CustomUserDetailsService customUserDetailsService;
 
     RedisTemplate<String, String> redisTemplate;
+    private final MemberAdaptor memberAdaptor;
+    private final EmailService emailService;
+
 
     public SecurityConfig(AuthenticationConfiguration authenticationConfiguration, JWTUtil jwtUtil,
                           RefreshTokenRepository refreshTokenRepository, AddRefreshTokenUtil addRefreshTokenUtil,
                           ObjectMapper objectMapper,
-                          CustomUserDetailsService customUserDetailsService) {
+                          CustomUserDetailsService customUserDetailsService, MemberAdaptor memberAdaptor,
+                          EmailService emailService) {
         this.authenticationConfiguration = authenticationConfiguration;
         this.jwtUtil = jwtUtil;
         this.refreshTokenRepository = refreshTokenRepository;
         this.addRefreshTokenUtil = addRefreshTokenUtil;
         this.objectMapper = objectMapper;
         this.customUserDetailsService = customUserDetailsService;
+        this.memberAdaptor = memberAdaptor;
+        this.emailService = emailService;
     }
 
     @Bean
@@ -115,7 +123,8 @@ public class SecurityConfig {
         http
                 .addFilterAt(
                         new CustomLoginAuthenticationFilter(authenticationManager(authenticationConfiguration), jwtUtil,
-                                refreshTokenRepository, addRefreshTokenUtil, objectMapper, redisTemplate),
+                                refreshTokenRepository, addRefreshTokenUtil, objectMapper, redisTemplate, memberAdaptor,
+                                emailService),
                         UsernamePasswordAuthenticationFilter.class);
 
 
