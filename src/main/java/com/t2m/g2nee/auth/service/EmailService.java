@@ -4,6 +4,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 public class EmailService {
     private final JavaMailSender javaMailSender;
 
+    @Async
     public void sendSimpleMessage(String emailAddress) throws Exception {
         MimeMessage message = javaMailSender.createMimeMessage();
         message.setFrom(new InternetAddress("g2neeShop@gmail.com", "G2neeShop"));// 보내는 사람
